@@ -19,7 +19,7 @@ This wastage costs the community money and strains limited resources, and it usu
 
 BCWP-AI monitors village assets, detects abnormal usage patterns, predicts wastage before it happens, and alerts villagers in time to act.
 
-##How It Works / Basic Workflow
+## how it works
 Feed information into the app or prototype
 Water tanks: tank capacity, flow rate and tank model.
 
