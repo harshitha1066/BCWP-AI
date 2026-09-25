@@ -1,0 +1,249 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>BCWP-AI: VillageGrid</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#eef3f1;--card:#fff;--ink:#12262b;--mut:#5a6f73;--line:#d3dfdc;--acc:#1f6f8b;--g:#2e8b57;--a:#b07d05;--r:#c8402f;--gb:#e0f1e7;--ab:#fbf0d2;--rb:#f9e0dc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1c1f;--card:#172a2e;--ink:#e6f0ee;--mut:#94adb0;--line:#284045;--acc:#5bb5d1;--g:#5fcf8d;--a:#e6b93c;--r:#ff7a68;--gb:#183a29;--ab:#3d3211;--rb:#48211c}}
+:root[data-theme="dark"]{--bg:#0f1c1f;--card:#172a2e;--ink:#e6f0ee;--mut:#94adb0;--line:#284045;--acc:#5bb5d1;--g:#5fcf8d;--a:#e6b93c;--r:#ff7a68;--gb:#183a29;--ab:#3d3211;--rb:#48211c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 'Atkinson Hyperlegible',system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--acc);color:#fff}
+header h1{font-size:18px;margin:0}
+header select,header button{font:inherit;padding:6px 8px;border-radius:8px;border:0}
+.badge{font-size:13px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.22)}.badge.off{background:#c8402f}
+nav{display:flex;background:var(--card);border-bottom:1px solid var(--line)}
+nav button{flex:1;padding:12px 4px;border:0;background:none;color:var(--mut);font:700 15px inherit;font-family:inherit;border-bottom:3px solid transparent}
+nav button.on{color:var(--acc);border-color:var(--acc)}
+main{max-width:760px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.st{border-left:8px solid var(--g)}.st.s1{border-color:var(--a)}.st.s2{border-color:var(--r)}
+.pill{display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--gb);color:var(--g)}.s1 .pill{background:var(--ab);color:var(--a)}.s2 .pill{background:var(--rb);color:var(--r)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.banner{border-radius:12px;padding:14px;margin-bottom:12px;background:var(--gb)}.banner.bad{background:var(--rb)}
+.banner b{display:block}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big button,.btn{font:700 17px inherit;font-family:inherit;padding:18px 8px;border-radius:12px;border:0;background:var(--acc);color:#fff}
+.btn{padding:9px 14px;font-size:15px;background:var(--card);color:var(--acc);border:1px solid var(--acc)}
+.big .off{background:var(--mut)}
+label{display:block;font-size:14px;color:var(--mut);margin:8px 0 3px}
+input,select{font:inherit;width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);box-sizing:border-box}
+small,.mut{color:var(--mut);font-size:14px}
+.log div{padding:4px 0;border-bottom:1px solid var(--line);font-size:14px}
+.cv{height:190px;position:relative}h2{font-size:17px;margin:4px 0 8px}
+</style></head><body>
+<header><h1 id="ttl">💧 BCWP-AI</h1><div class="row"><span id="net" class="badge"></span><button onclick="fo()" id="fob"></button><select id="lg" onchange="cfg('lang',this.value)"><option value="en">English</option><option value="kn">ಕನ್ನಡ</option><option value="hi">हिन्दी</option></select></div></header>
+<nav id="nav"></nav><main id="v"></main>
+<script>
+const $=s=>document.querySelector(s),H=36e5,D=864e5;
+const tf=(s,o)=>s.replace(/\{(\w+)\}/g,(_,k)=>o[k]);
+const T={
+en:{appName:'BCWP-AI: VillageGrid',home:'Home',op:'Operator',hist:'History',setup:'Setup',ok:'Normal',warn:'Warning',bad:'Abnormal',tank:'Water tank',light:'Streetlights',elec:'Electricity',
+tk:'Warning: water tank is about to overflow. Pump has been switched off.',lk:'Street lights were on during the day. They have been switched off.',ek:'Electricity use is much higher than expected. Please check.',
+pon:'Pump ON',pof:'Pump OFF',lon:'Light ON',lof:'Light OFF',ack:'Acknowledge',voice:'Play voice',sim:'Simulate data',
+vapp:'Village App',vChoose:'Choose your language',vWelcome:'Village Alerts',vAllGood:'No problems right now',vAttn:'Please tell the operator or panchayat',vGotIt:'Got it',vNew:'New alert',vListen:'Listen again',
+online:'Online',offline:'Offline: using local memory',goOnline:'Go online',testOffline:'Test offline',
+liveTitle:'Predictive engine: live mode',liveDesc:'Internet available. Using live monitoring. Professionals get a buzz and a voice call.',
+offTitle:'Predictive engine: offline mode',offDesc:'No internet. Alerts come from the math model (tank fill physics and stored sunrise/sunset times){sync}, running a check loop on this device. Professionals get a buzz and an SMS.',
+syncedOn:', synced on {t}',syncPending:'. Sync it once while online',syncBtn:'Sync data for offline use',
+predSoon:'Predicted to happen soon',abnNow:'Abnormal now',sysResp:'System response',alerted:'Alerted',escBanner:' (escalated to panchayat)',
+allNormal:'All assets are behaving normally.',updated:'Updated',
+noData:'No data yet. Create a week of history with three faults to see the full loop.',
+whatHappened:'What the system did',smsLog:'SMS log',nothingYet:'Nothing yet',none:'None',
+toWord:'to',ackedWord:'Acknowledged',escWord:' + escalated',
+meterLabel:'Units used today (meter reading)',saveReading:'Save reading',
+tankPctLabel:'Tank level % (optional sensor)',sendSensor:'Send sensor reading',
+sensorNote:'Without a sensor reading, the tank level is predicted from pump logs.',simNote:'Run this first for the demo.',
+d7:'7 days',d30:'30 days',chTank:'Tank level (litres)',chPump:'Pump run hours per day',chLight:'Streetlight hours per day',chElec:'Electricity units per day',
+setupTitle:'Assets (one-time setup)',capLabel:'Tank capacity (L)',flowLabel:'Pump flow rate (L/h)',modelLabel:'Tank model',useLabel:'Daily water use (L)',
+lightOnLabel:'Streetlights ON at',lightOffLabel:'Streetlights OFF at',billLabel:'Monthly electricity bill (units)',escLabel:'Escalate if unacknowledged (minutes)',leadLabel:'Predict this many minutes ahead',
+demoLabel:'Demo mode: pretend it is 12:00 noon (set before simulating)',
+contactsTitle:'Contacts',resetBtn:'Reset everything',resetConfirm:'Erase all data?',
+roleOperator:'Pump operator',roleElectrician:'Electrician',rolePanchayat:'Panchayat member',
+srcPred:'predicted',srcSensor:'sensor',
+tkNormal:'Tank about {pct}% full ({src})',tkOverflow:'Tank full and pump still running',tkPredict:'Predicted to overflow in ~{eta} min (physics: flow {flow} L/h, tank {cap} L)',tkStopped:'Tank full. Pump stopped.',
+lightNight:'Lights ON (night schedule)',lightDayOff:'Lights OFF',lightDayOn:'Lights are ON in daytime',lightPredict:'Sunrise at {t}, lights due OFF in ~{eta} min (still ON)',
+elecNone:'No meter data yet',elecMsg:'{u} units vs {ex} expected ({sign}{pct}%)',
+abnTankPred:'Tank predicted to overflow in ~{eta} min',abnTankNow:'Tank overflowing now',abnLightPred:'Lights due OFF at sunrise in ~{eta} min, still ON',abnLightNow:'Lights on in daytime now',abnElec:'Electricity use far above expected',
+autoTankPred:'Pump will be auto-stopped when full',autoTankNow:'Pump switched off',autoLightPred:'Will auto-correct at sunrise if not fixed',autoLightNow:'Lights switched off',autoElec:'None. Needs a person',
+logPumpAuto:'Pump switched OFF automatically (relay)',logLightAuto:'Streetlights switched OFF to match schedule',
+logAlertSent:'Alert sent to {name}{via}',viaOff:', as a buzz and SMS from the offline predictive engine',viaLive:', as a buzz and voice call (live monitoring)',
+smsLine:'{time} {mode} to {name} ({phone}): {txt}',modeOff:'Buzz + SMS (predictive engine, offline)',modeLive:'Buzz + voice + SMS (live)',predTag:'[PREDICTED] ',
+logSynced:'Synced sunrise/sunset times and thresholds from server for offline use',logSimData:'Demo data created: 30 days of history plus 3 faults',
+logPumpLog:'Pump {state} logged by operator',logLightLog:'Light {state} logged by operator',stateOn:'ON',stateOff:'OFF',
+logMeter:'Meter reading logged',logSensor:'Sensor reading received',logAck:'{name} acknowledged the alert',
+logEscalated:'Not acknowledged in {m} min. Escalated to {name}',logSyncedRecords:'Synced {n} offline records'},
+
+kn:{appName:'BCWP-AI: ವಿಲೇಜ್‌ಗ್ರಿಡ್',home:'ಮುಖಪುಟ',op:'ಆಪರೇಟರ್',hist:'ಇತಿಹಾಸ',setup:'ಸೆಟಪ್',ok:'ಸಾಮಾನ್ಯ',warn:'ಎಚ್ಚರಿಕೆ',bad:'ಅಸಹಜ',tank:'ನೀರಿನ ಟ್ಯಾಂಕ್',light:'ಬೀದಿ ದೀಪಗಳು',elec:'ವಿದ್ಯುತ್',
+tk:'ಎಚ್ಚರಿಕೆ: ನೀರಿನ ಟ್ಯಾಂಕ್ ತುಂಬಿ ಹರಿಯುವ ಹಂತದಲ್ಲಿದೆ. ಪಂಪ್ ಅನ್ನು ಆಫ್ ಮಾಡಲಾಗಿದೆ.',lk:'ಹಗಲಿನಲ್ಲಿ ಬೀದಿ ದೀಪಗಳು ಉರಿಯುತ್ತಿದ್ದವು. ಅವನ್ನು ಆಫ್ ಮಾಡಲಾಗಿದೆ.',ek:'ವಿದ್ಯುತ್ ಬಳಕೆ ನಿರೀಕ್ಷೆಗಿಂತ ಬಹಳ ಹೆಚ್ಚಾಗಿದೆ. ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿ.',
+pon:'ಪಂಪ್ ಆನ್',pof:'ಪಂಪ್ ಆಫ್',lon:'ದೀಪ ಆನ್',lof:'ದೀಪ ಆಫ್',ack:'ಸ್ವೀಕರಿಸಿ',voice:'ಧ್ವನಿ ಕೇಳಿ',sim:'ಡೆಮೊ ಡೇಟಾ',
+vapp:'ಗ್ರಾಮ ಆ್ಯಪ್',vChoose:'ನಿಮ್ಮ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ',vWelcome:'ಗ್ರಾಮ ಎಚ್ಚರಿಕೆಗಳು',vAllGood:'ಈಗ ಯಾವುದೇ ಸಮಸ್ಯೆ ಇಲ್ಲ',vAttn:'ದಯವಿಟ್ಟು ಆಪರೇಟರ್ ಅಥವಾ ಪಂಚಾಯತ್‌ಗೆ ತಿಳಿಸಿ',vGotIt:'ಅರ್ಥವಾಯಿತು',vNew:'ಹೊಸ ಎಚ್ಚರಿಕೆ',vListen:'ಮತ್ತೆ ಕೇಳಿ',
+online:'ಆನ್‌ಲೈನ್',offline:'ಆಫ್‌ಲೈನ್: ಸ್ಥಳೀಯ ಮೆಮೊರಿ ಬಳಸಲಾಗುತ್ತಿದೆ',goOnline:'ಆನ್‌ಲೈನ್‌ಗೆ ಹೋಗಿ',testOffline:'ಆಫ್‌ಲೈನ್ ಪರೀಕ್ಷಿಸಿ',
+liveTitle:'ಮುನ್ಸೂಚನಾ ವ್ಯವಸ್ಥೆ: ಲೈವ್ ಮೋಡ್',liveDesc:'ಇಂಟರ್ನೆಟ್ ಲಭ್ಯವಿದೆ. ಲೈವ್ ಮೇಲ್ವಿಚಾರಣೆ ಬಳಸಲಾಗುತ್ತಿದೆ. ವೃತ್ತಿಪರರಿಗೆ ಕಂಪನ ಮತ್ತು ಧ್ವನಿ ಕರೆ ಸಿಗುತ್ತದೆ.',
+offTitle:'ಮುನ್ಸೂಚನಾ ವ್ಯವಸ್ಥೆ: ಆಫ್‌ಲೈನ್ ಮೋಡ್',offDesc:'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ. ಎಚ್ಚರಿಕೆಗಳು ಗಣಿತದ ಮಾದರಿಯಿಂದ (ಟ್ಯಾಂಕ್ ಭರ್ತಿ ಭೌತಶಾಸ್ತ್ರ ಮತ್ತು ಸಂಗ್ರಹಿಸಿದ ಸೂರ್ಯೋದಯ/ಸೂರ್ಯಾಸ್ತ ಸಮಯ){sync} ಬರುತ್ತವೆ, ಈ ಸಾಧನದಲ್ಲಿ ಪರಿಶೀಲನಾ ಲೂಪ್ ಚಾಲನೆಯಲ್ಲಿದೆ. ವೃತ್ತಿಪರರಿಗೆ ಕಂಪನ ಮತ್ತು SMS ಸಿಗುತ್ತದೆ.',
+syncedOn:', {t} ರಂದು ಸಿಂಕ್ ಮಾಡಲಾಗಿದೆ',syncPending:'. ಆನ್‌ಲೈನ್‌ನಲ್ಲಿರುವಾಗ ಒಮ್ಮೆ ಸಿಂಕ್ ಮಾಡಿ',syncBtn:'ಆಫ್‌ಲೈನ್ ಬಳಕೆಗಾಗಿ ಡೇಟಾ ಸಿಂಕ್ ಮಾಡಿ',
+predSoon:'ಶೀಘ್ರದಲ್ಲೇ ಸಂಭವಿಸುವ ಮುನ್ಸೂಚನೆ',abnNow:'ಈಗ ಅಸಹಜ',sysResp:'ವ್ಯವಸ್ಥೆಯ ಪ್ರತಿಕ್ರಿಯೆ',alerted:'ಎಚ್ಚರಿಸಲಾಗಿದೆ',escBanner:' (ಪಂಚಾಯತ್‌ಗೆ ಹೆಚ್ಚಿಸಲಾಗಿದೆ)',
+allNormal:'ಎಲ್ಲಾ ಆಸ್ತಿಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿವೆ.',updated:'ನವೀಕರಿಸಲಾಗಿದೆ',
+noData:'ಇನ್ನೂ ಡೇಟಾ ಇಲ್ಲ. ಪೂರ್ಣ ಲೂಪ್ ನೋಡಲು ಮೂರು ದೋಷಗಳೊಂದಿಗೆ ಒಂದು ವಾರದ ಇತಿಹಾಸ ರಚಿಸಿ.',
+whatHappened:'ವ್ಯವಸ್ಥೆ ಏನು ಮಾಡಿತು',smsLog:'SMS ದಾಖಲೆ',nothingYet:'ಇನ್ನೂ ಏನೂ ಇಲ್ಲ',none:'ಯಾವುದೂ ಇಲ್ಲ',
+toWord:'ಗೆ',ackedWord:'ಸ್ವೀಕರಿಸಲಾಗಿದೆ',escWord:' + ಹೆಚ್ಚಿಸಲಾಗಿದೆ',
+meterLabel:'ಇಂದು ಬಳಸಿದ ಯುನಿಟ್‌ಗಳು (ಮೀಟರ್ ರೀಡಿಂಗ್)',saveReading:'ರೀಡಿಂಗ್ ಉಳಿಸಿ',
+tankPctLabel:'ಟ್ಯಾಂಕ್ ಮಟ್ಟ % (ಐಚ್ಛಿಕ ಸೆನ್ಸಾರ್)',sendSensor:'ಸೆನ್ಸಾರ್ ರೀಡಿಂಗ್ ಕಳುಹಿಸಿ',
+sensorNote:'ಸೆನ್ಸಾರ್ ರೀಡಿಂಗ್ ಇಲ್ಲದಿದ್ದರೆ, ಟ್ಯಾಂಕ್ ಮಟ್ಟವನ್ನು ಪಂಪ್ ದಾಖಲೆಗಳಿಂದ ಊಹಿಸಲಾಗುತ್ತದೆ.',simNote:'ಡೆಮೊಗಾಗಿ ಮೊದಲು ಇದನ್ನು ಚಲಾಯಿಸಿ.',
+d7:'7 ದಿನಗಳು',d30:'30 ದಿನಗಳು',chTank:'ಟ್ಯಾಂಕ್ ಮಟ್ಟ (ಲೀಟರ್)',chPump:'ದಿನಕ್ಕೆ ಪಂಪ್ ಚಾಲನೆಯ ಗಂಟೆಗಳು',chLight:'ದಿನಕ್ಕೆ ಬೀದಿ ದೀಪದ ಗಂಟೆಗಳು',chElec:'ದಿನಕ್ಕೆ ವಿದ್ಯುತ್ ಯುನಿಟ್‌ಗಳು',
+setupTitle:'ಆಸ್ತಿಗಳು (ಒಂದು-ಬಾರಿ ಸೆಟಪ್)',capLabel:'ಟ್ಯಾಂಕ್ ಸಾಮರ್ಥ್ಯ (L)',flowLabel:'ಪಂಪ್ ಹರಿವಿನ ದರ (L/h)',modelLabel:'ಟ್ಯಾಂಕ್ ಮಾದರಿ',useLabel:'ದೈನಂದಿನ ನೀರಿನ ಬಳಕೆ (L)',
+lightOnLabel:'ಬೀದಿ ದೀಪಗಳು ಆನ್ ಆಗುವ ಸಮಯ',lightOffLabel:'ಬೀದಿ ದೀಪಗಳು ಆಫ್ ಆಗುವ ಸಮಯ',billLabel:'ಮಾಸಿಕ ವಿದ್ಯುತ್ ಬಿಲ್ (ಯುನಿಟ್‌ಗಳು)',escLabel:'ಸ್ವೀಕರಿಸದಿದ್ದರೆ ಎಷ್ಟು ನಿಮಿಷಗಳಲ್ಲಿ ಹೆಚ್ಚಿಸಬೇಕು',leadLabel:'ಎಷ್ಟು ನಿಮಿಷ ಮುಂಚಿತವಾಗಿ ಮುನ್ಸೂಚಿಸಬೇಕು',
+demoLabel:'ಡೆಮೊ ಮೋಡ್: ಈಗ ಮಧ್ಯಾಹ್ನ 12:00 ಎಂದು ಪರಿಗಣಿಸಿ (ಸಿಮ್ಯುಲೇಟ್ ಮಾಡುವ ಮೊದಲು ಆನ್ ಮಾಡಿ)',
+contactsTitle:'ಸಂಪರ್ಕಗಳು',resetBtn:'ಎಲ್ಲವನ್ನೂ ಮರುಹೊಂದಿಸಿ',resetConfirm:'ಎಲ್ಲಾ ಡೇಟಾ ಅಳಿಸಬೇಕೆ?',
+roleOperator:'ಪಂಪ್ ಆಪರೇಟರ್',roleElectrician:'ಎಲೆಕ್ಟ್ರಿಷಿಯನ್',rolePanchayat:'ಪಂಚಾಯತ್ ಸದಸ್ಯ',
+srcPred:'ಮುನ್ಸೂಚಿತ',srcSensor:'ಸೆನ್ಸಾರ್',
+tkNormal:'ಟ್ಯಾಂಕ್ ಸುಮಾರು {pct}% ಭರ್ತಿ ({src})',tkOverflow:'ಟ್ಯಾಂಕ್ ಭರ್ತಿಯಾಗಿದ್ದು ಪಂಪ್ ಇನ್ನೂ ಚಾಲನೆಯಲ್ಲಿದೆ',tkPredict:'~{eta} ನಿಮಿಷದಲ್ಲಿ ತುಂಬಿ ಹರಿಯುವ ಮುನ್ಸೂಚನೆ (ಭೌತಶಾಸ್ತ್ರ: ಹರಿವು {flow} L/h, ಟ್ಯಾಂಕ್ {cap} L)',tkStopped:'ಟ್ಯಾಂಕ್ ಭರ್ತಿಯಾಗಿದೆ. ಪಂಪ್ ನಿಲ್ಲಿಸಲಾಗಿದೆ.',
+lightNight:'ದೀಪಗಳು ಆನ್ (ರಾತ್ರಿ ವೇಳಾಪಟ್ಟಿ)',lightDayOff:'ದೀಪಗಳು ಆಫ್',lightDayOn:'ಹಗಲಿನಲ್ಲಿ ದೀಪಗಳು ಆನ್ ಆಗಿವೆ',lightPredict:'ಸೂರ್ಯೋದಯ {t} ಗೆ, ದೀಪಗಳು ~{eta} ನಿಮಿಷದಲ್ಲಿ ಆಫ್ ಆಗಬೇಕು (ಇನ್ನೂ ಆನ್ ಇವೆ)',
+elecNone:'ಇನ್ನೂ ಮೀಟರ್ ಡೇಟಾ ಇಲ್ಲ',elecMsg:'{u} ಯುನಿಟ್‌ಗಳು, ನಿರೀಕ್ಷಿತ {ex} ({sign}{pct}%)',
+abnTankPred:'ಟ್ಯಾಂಕ್ ~{eta} ನಿಮಿಷದಲ್ಲಿ ತುಂಬಿ ಹರಿಯುವ ಮುನ್ಸೂಚನೆ',abnTankNow:'ಟ್ಯಾಂಕ್ ಈಗ ತುಂಬಿ ಹರಿಯುತ್ತಿದೆ',abnLightPred:'ಸೂರ್ಯೋದಯದಲ್ಲಿ ~{eta} ನಿಮಿಷದಲ್ಲಿ ದೀಪಗಳು ಆಫ್ ಆಗಬೇಕು, ಇನ್ನೂ ಆನ್ ಇವೆ',abnLightNow:'ಈಗ ಹಗಲಿನಲ್ಲಿ ದೀಪಗಳು ಆನ್ ಇವೆ',abnElec:'ವಿದ್ಯುತ್ ಬಳಕೆ ನಿರೀಕ್ಷೆಗಿಂತ ಬಹಳ ಹೆಚ್ಚಾಗಿದೆ',
+autoTankPred:'ಭರ್ತಿಯಾದಾಗ ಪಂಪ್ ಸ್ವಯಂ ನಿಲ್ಲುತ್ತದೆ',autoTankNow:'ಪಂಪ್ ಆಫ್ ಮಾಡಲಾಗಿದೆ',autoLightPred:'ಸರಿಪಡಿಸದಿದ್ದರೆ ಸೂರ್ಯೋದಯದಲ್ಲಿ ಸ್ವಯಂ ಸರಿಪಡಿಸಲಾಗುತ್ತದೆ',autoLightNow:'ದೀಪಗಳು ಆಫ್ ಮಾಡಲಾಗಿದೆ',autoElec:'ಯಾವುದೂ ಇಲ್ಲ. ವ್ಯಕ್ತಿ ಬೇಕು',
+logPumpAuto:'ಪಂಪ್ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಆಫ್ ಆಗಿದೆ (ರಿಲೇ)',logLightAuto:'ವೇಳಾಪಟ್ಟಿಗೆ ಹೊಂದಿಸಲು ಬೀದಿ ದೀಪಗಳು ಆಫ್ ಆಗಿವೆ',
+logAlertSent:'{name} ಗೆ ಎಚ್ಚರಿಕೆ ಕಳುಹಿಸಲಾಗಿದೆ{via}',viaOff:', ಆಫ್‌ಲೈನ್ ಮುನ್ಸೂಚನಾ ವ್ಯವಸ್ಥೆಯಿಂದ ಕಂಪನ ಮತ್ತು SMS ಆಗಿ',viaLive:', ಕಂಪನ ಮತ್ತು ಧ್ವನಿ ಕರೆ ಆಗಿ (ಲೈವ್ ಮೇಲ್ವಿಚಾರಣೆ)',
+smsLine:'{time} {mode}, {name} ({phone}) ಗೆ: {txt}',modeOff:'ಕಂಪನ + SMS (ಮುನ್ಸೂಚನಾ ವ್ಯವಸ್ಥೆ, ಆಫ್‌ಲೈನ್)',modeLive:'ಕಂಪನ + ಧ್ವನಿ + SMS (ಲೈವ್)',predTag:'[ಮುನ್ಸೂಚಿತ] ',
+logSynced:'ಸೂರ್ಯೋದಯ/ಸೂರ್ಯಾಸ್ತ ಸಮಯ ಮತ್ತು ಮಿತಿಗಳನ್ನು ಸರ್ವರ್‌ನಿಂದ ಆಫ್‌ಲೈನ್ ಬಳಕೆಗಾಗಿ ಸಿಂಕ್ ಮಾಡಲಾಗಿದೆ',logSimData:'ಡೆಮೊ ಡೇಟಾ ರಚಿಸಲಾಗಿದೆ: 30 ದಿನಗಳ ಇತಿಹಾಸ ಮತ್ತು 3 ದೋಷಗಳು',
+logPumpLog:'ಪಂಪ್ {state} ಎಂದು ಆಪರೇಟರ್ ದಾಖಲಿಸಿದ್ದಾರೆ',logLightLog:'ದೀಪ {state} ಎಂದು ಆಪರೇಟರ್ ದಾಖಲಿಸಿದ್ದಾರೆ',stateOn:'ಆನ್',stateOff:'ಆಫ್',
+logMeter:'ಮೀಟರ್ ರೀಡಿಂಗ್ ದಾಖಲಿಸಲಾಗಿದೆ',logSensor:'ಸೆನ್ಸಾರ್ ರೀಡಿಂಗ್ ಸ್ವೀಕರಿಸಲಾಗಿದೆ',logAck:'{name} ಎಚ್ಚರಿಕೆಯನ್ನು ಸ್ವೀಕರಿಸಿದ್ದಾರೆ',
+logEscalated:'{m} ನಿಮಿಷದಲ್ಲಿ ಸ್ವೀಕರಿಸಲಿಲ್ಲ. {name} ಗೆ ಹೆಚ್ಚಿಸಲಾಗಿದೆ',logSyncedRecords:'{n} ಆಫ್‌ಲೈನ್ ದಾಖಲೆಗಳನ್ನು ಸಿಂಕ್ ಮಾಡಲಾಗಿದೆ'},
+
+hi:{appName:'BCWP-AI: विलेजग्रिड',home:'होम',op:'ऑपरेटर',hist:'इतिहास',setup:'सेटअप',ok:'सामान्य',warn:'चेतावनी',bad:'असामान्य',tank:'पानी की टंकी',light:'स्ट्रीट लाइट',elec:'बिजली',
+tk:'चेतावनी: पानी की टंकी भरने वाली है। पंप बंद कर दिया गया है।',lk:'दिन में स्ट्रीट लाइटें जल रही थीं। उन्हें बंद कर दिया गया है।',ek:'बिजली की खपत अपेक्षा से बहुत ज़्यादा है। कृपया जाँच करें।',
+pon:'पंप चालू',pof:'पंप बंद',lon:'लाइट चालू',lof:'लाइट बंद',ack:'स्वीकार करें',voice:'आवाज़ सुनें',sim:'डेमो डेटा',
+vapp:'ग्राम ऐप',vChoose:'अपनी भाषा चुनें',vWelcome:'ग्राम अलर्ट',vAllGood:'अभी कोई समस्या नहीं है',vAttn:'कृपया ऑपरेटर या पंचायत को बताएँ',vGotIt:'समझ गया',vNew:'नया अलर्ट',vListen:'फिर से सुनें',
+online:'ऑनलाइन',offline:'ऑफ़लाइन: स्थानीय मेमोरी उपयोग हो रही है',goOnline:'ऑनलाइन जाएँ',testOffline:'ऑफ़लाइन जाँचें',
+liveTitle:'भविष्यसूचक इंजन: लाइव मोड',liveDesc:'इंटरनेट उपलब्ध है। लाइव निगरानी का उपयोग हो रहा है। पेशेवरों को कंपन और वॉइस कॉल मिलेगी।',
+offTitle:'भविष्यसूचक इंजन: ऑफ़लाइन मोड',offDesc:'इंटरनेट नहीं है। अलर्ट गणितीय मॉडल (टंकी भरने का भौतिकी और संग्रहित सूर्योदय/सूर्यास्त समय) से आते हैं{sync}, इस डिवाइस पर एक जाँच लूप चल रहा है। पेशेवरों को कंपन और SMS मिलेगा।',
+syncedOn:', {t} को सिंक किया गया',syncPending:'. इंटरनेट रहते एक बार सिंक कर लें',syncBtn:'ऑफ़लाइन उपयोग के लिए डेटा सिंक करें',
+predSoon:'जल्द होने की भविष्यवाणी',abnNow:'अभी असामान्य',sysResp:'सिस्टम की प्रतिक्रिया',alerted:'सूचित किया गया',escBanner:' (पंचायत को भेजा गया)',
+allNormal:'सभी संपत्तियाँ सामान्य रूप से काम कर रही हैं।',updated:'अपडेट किया गया',
+noData:'अभी कोई डेटा नहीं है। पूरा लूप देखने के लिए तीन खामियों वाला एक हफ्ते का इतिहास बनाएँ।',
+whatHappened:'सिस्टम ने क्या किया',smsLog:'SMS लॉग',nothingYet:'अभी कुछ नहीं',none:'कोई नहीं',
+toWord:'को',ackedWord:'स्वीकार किया गया',escWord:' + भेजा गया',
+meterLabel:'आज इस्तेमाल हुई यूनिट (मीटर रीडिंग)',saveReading:'रीडिंग सेव करें',
+tankPctLabel:'टंकी का स्तर % (वैकल्पिक सेंसर)',sendSensor:'सेंसर रीडिंग भेजें',
+sensorNote:'सेंसर रीडिंग न होने पर, टंकी का स्तर पंप लॉग से अनुमानित होता है।',simNote:'डेमो के लिए पहले इसे चलाएँ।',
+d7:'7 दिन',d30:'30 दिन',chTank:'टंकी का स्तर (लीटर)',chPump:'प्रतिदिन पंप चलने के घंटे',chLight:'प्रतिदिन स्ट्रीट लाइट के घंटे',chElec:'प्रतिदिन बिजली की यूनिट',
+setupTitle:'संपत्तियाँ (एक बार का सेटअप)',capLabel:'टंकी की क्षमता (L)',flowLabel:'पंप प्रवाह दर (L/h)',modelLabel:'टंकी मॉडल',useLabel:'दैनिक पानी का उपयोग (L)',
+lightOnLabel:'स्ट्रीट लाइट चालू होने का समय',lightOffLabel:'स्ट्रीट लाइट बंद होने का समय',billLabel:'मासिक बिजली बिल (यूनिट)',escLabel:'स्वीकार न होने पर कितने मिनट में आगे भेजें',leadLabel:'कितने मिनट पहले भविष्यवाणी करनी है',
+demoLabel:'डेमो मोड: मान लें अभी दोपहर 12:00 बजे हैं (सिमुलेट करने से पहले चालू करें)',
+contactsTitle:'संपर्क',resetBtn:'सब कुछ रीसेट करें',resetConfirm:'सारा डेटा मिटाएँ?',
+roleOperator:'पंप ऑपरेटर',roleElectrician:'इलेक्ट्रीशियन',rolePanchayat:'पंचायत सदस्य',
+srcPred:'अनुमानित',srcSensor:'सेंसर',
+tkNormal:'टंकी लगभग {pct}% भरी है ({src})',tkOverflow:'टंकी भर चुकी है और पंप अभी भी चल रहा है',tkPredict:'~{eta} मिनट में भरने की भविष्यवाणी (भौतिकी: प्रवाह {flow} L/h, टंकी {cap} L)',tkStopped:'टंकी भर गई है। पंप रोक दिया गया है।',
+lightNight:'लाइटें चालू (रात्रि समय-सारणी)',lightDayOff:'लाइटें बंद',lightDayOn:'दिन में लाइटें चालू हैं',lightPredict:'सूर्योदय {t} बजे, लाइटें ~{eta} मिनट में बंद होनी चाहिए (अभी भी चालू हैं)',
+elecNone:'अभी तक मीटर डेटा नहीं है',elecMsg:'{u} यूनिट, अपेक्षित {ex} ({sign}{pct}%)',
+abnTankPred:'टंकी के ~{eta} मिनट में भरने की भविष्यवाणी',abnTankNow:'टंकी अभी बह रही है',abnLightPred:'सूर्योदय पर ~{eta} मिनट में लाइटें बंद होनी चाहिए, अभी भी चालू हैं',abnLightNow:'अभी दिन में लाइटें चालू हैं',abnElec:'बिजली की खपत अपेक्षा से बहुत ज़्यादा है',
+autoTankPred:'भरने पर पंप अपने आप बंद हो जाएगा',autoTankNow:'पंप बंद कर दिया गया',autoLightPred:'ठीक न होने पर सूर्योदय पर अपने आप ठीक हो जाएगा',autoLightNow:'लाइटें बंद कर दी गईं',autoElec:'कुछ नहीं। व्यक्ति की ज़रूरत है',
+logPumpAuto:'पंप अपने आप बंद हो गया (रिले)',logLightAuto:'समय-सारणी के अनुसार स्ट्रीट लाइटें बंद कर दी गईं',
+logAlertSent:'{name} को अलर्ट भेजा गया{via}',viaOff:', ऑफ़लाइन भविष्यसूचक इंजन से कंपन और SMS के रूप में',viaLive:', कंपन और वॉइस कॉल के रूप में (लाइव निगरानी)',
+smsLine:'{time} {mode}, {name} ({phone}) को: {txt}',modeOff:'कंपन + SMS (भविष्यसूचक इंजन, ऑफ़लाइन)',modeLive:'कंपन + आवाज़ + SMS (लाइव)',predTag:'[भविष्यवाणी] ',
+logSynced:'सूर्योदय/सूर्यास्त समय और सीमाएँ सर्वर से ऑफ़लाइन उपयोग के लिए सिंक की गईं',logSimData:'डेमो डेटा बना: 30 दिन का इतिहास और 3 खामियाँ',
+logPumpLog:'ऑपरेटर ने पंप {state} दर्ज किया',logLightLog:'ऑपरेटर ने लाइट {state} दर्ज की',stateOn:'चालू',stateOff:'बंद',
+logMeter:'मीटर रीडिंग दर्ज की गई',logSensor:'सेंसर रीडिंग मिली',logAck:'{name} ने अलर्ट स्वीकार किया',
+logEscalated:'{m} मिनट में स्वीकार नहीं हुआ। {name} को भेजा गया',logSyncedRecords:'{n} ऑफ़लाइन रिकॉर्ड सिंक किए गए'}};
+
+const def=()=>({cfg:{cap:10000,flow:2000,model:'Overhead 10 kL',use:3000,lightOn:'18:30',lightOff:'06:00',bill:1200,esc:10,lead:20,lang:'en',vlang:'kn',noon:false,fo:false,synced:0},pump:[],light:[],elec:[],sensor:null,pend:0,alerts:[],actions:[],sms:[],
+contacts:[{roleKey:'roleOperator',name:'Ramesh',phone:'+91 90000 00001',lang:'kn',asset:'tank'},{roleKey:'roleElectrician',name:'Suresh',phone:'+91 90000 00002',lang:'kn',asset:'light,elec'},{roleKey:'rolePanchayat',name:'Lakshmi',phone:'+91 90000 00003',lang:'hi',asset:'all'}]});
+let S;try{S=JSON.parse(localStorage.getItem('vg1'))}catch(e){}if(!S)S=def();
+if(S.contacts&&S.contacts[0]&&S.contacts[0].role&&!S.contacts[0].roleKey){const rk=['roleOperator','roleElectrician','rolePanchayat'];S.contacts.forEach((c,i)=>{c.roleKey=rk[i]||'roleOperator';delete c.role})}
+const save=()=>{try{localStorage.setItem('vg1',JSON.stringify(S))}catch(e){}};
+let tab='home',rng=7,charts=[];
+const L=()=>T[S.cfg.lang],now=()=>{const d=new Date();if(S.cfg.noon)d.setHours(12,0,0,0);return+d};
+const off=()=>S.cfg.fo||!navigator.onLine,hm=t=>new Date(t).toTimeString().slice(0,5);
+const act=m=>{S.actions.unshift({t:Date.now(),m});S.actions=S.actions.slice(0,30)};
+function replay(end){const c=S.cfg,ev=S.pump.filter(e=>e.t<=end).sort((a,b)=>a.t-b.t);if(!ev.length)return{lv:c.cap*.5,on:false,ser:[]};
+let t=ev[0].t,lv=c.cap*.5,on=false,i=0,ser=[],ur=c.use/24,tk=t+H;
+while(t<end){while(i<ev.length&&ev[i].t<=t){on=ev[i].on;i++}let nt=Math.min(end,i<ev.length?ev[i].t:end,tk),h=(nt-t)/H;lv=Math.min(c.cap,Math.max(0,lv+(on?c.flow:0)*h-ur*h));t=nt;if(t>=tk){ser.push({t,lv});tk+=H}}
+while(i<ev.length&&ev[i].t<=t){on=ev[i].on;i++}return{lv,on,ser}}
+function isDay(t){const d=new Date(t),m=d.getHours()*60+d.getMinutes(),p=s=>+s.slice(0,2)*60+ +s.slice(3);return m>=p(S.cfg.lightOff)&&m<p(S.cfg.lightOn)}
+const z=(x,a)=>{const m=a.reduce((s,v)=>s+v,0)/a.length,sd=Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length)||1;return(x-m)/sd};
+function status(){const l=L(),c=S.cfg,n=now(),r=replay(n);let lv=r.lv,src=l.srcPred;
+if(S.sensor&&n-S.sensor.t<.5*H){lv=S.sensor.p/100*c.cap;src=l.srcSensor}
+const p=lv/c.cap,pct=Math.round(p*100),rate=c.flow-c.use/24;const etaMin=r.on&&rate>0?Math.round((c.cap*.95-lv)/rate*60):null;
+let tk={s:0,m:tf(l.tkNormal,{pct,src}),eta:etaMin};
+if(r.on&&p>=.95)tk={s:2,m:l.tkOverflow,eta:0};
+else if(r.on&&etaMin!==null&&etaMin<=c.lead)tk={s:1,m:tf(l.tkPredict,{eta:Math.max(1,etaMin),flow:c.flow,cap:c.cap}),eta:etaMin};
+else if(p>=.95)tk={s:1,m:l.tkStopped,eta:0};
+const ll=S.light.filter(e=>e.t<=n).sort((a,b)=>a.t-b.t).pop(),lo=ll&&ll.on;
+const p2=s=>+s.slice(0,2)*60+ +s.slice(3),mNow=new Date(n).getHours()*60+new Date(n).getMinutes(),offM=p2(c.lightOff),onM=p2(c.lightOn);
+let nextT=offM>mNow?offM:(onM>mNow?onM:offM+1440),nextIsOff=nextT===offM||nextT===offM+1440,nextEta=nextT-mNow;
+let li={s:0,m:lo?l.lightNight:l.lightDayOff,eta:nextEta};
+if(lo&&isDay(n))li={s:2,m:l.lightDayOn,eta:0};
+else if(lo&&nextIsOff&&nextEta<=c.lead)li={s:1,m:tf(l.lightPredict,{t:c.lightOff,eta:nextEta}),eta:nextEta};
+const el=S.elec[S.elec.length-1];let ec={s:0,m:l.elecNone};
+if(el){const ex=c.bill/30,dv=(el.u-ex)/ex,zz=z(el.u,S.elec.map(e=>e.u));ec={s:dv>.4?2:dv>.2||zz>2.5?1:0,m:tf(l.elecMsg,{u:el.u,ex:ex.toFixed(0),sign:dv>0?'+':'',pct:Math.round(dv*100)})}}
+return{tank:tk,light:li,elec:ec,on:r.on,p,lo,el}}
+function raise(kind,abn,auto,key,pred){if(S.alerts.some(a=>a.key===key))return;const l=L(),c=S.contacts.find(c=>c.asset.split(',').includes(kind)),k={tank:'tk',light:'lk',elec:'ek'}[kind],txt=(pred?l.predTag:'')+T[c.lang][k];
+S.alerts.unshift({id:Date.now(),kind,key,t:Date.now(),ack:false,esc:false,to:c.name,roleKey:c.roleKey,lang:c.lang,abn,auto,pred});
+S.sms.unshift(tf(l.smsLine,{time:hm(Date.now()),mode:off()?l.modeOff:l.modeLive,name:c.name,phone:c.phone,txt}));
+act(tf(l.logAlertSent,{name:c.name,via:off()?l.viaOff:l.viaLive}));buzz();if(!off())speak(txt,c.lang)}
+function speak(t,lg){try{const u=new SpeechSynthesisUtterance(t);u.lang={en:'en-IN',kn:'kn-IN',hi:'hi-IN'}[lg];speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function buzz(){try{navigator.vibrate&&navigator.vibrate([250,120,250,120,450])}catch(e){}}
+function monitor(){const l=L(),n=now();let s=status();
+if(s.tank.s===1)raise('tank',tf(l.abnTankPred,{eta:s.tank.eta}),l.autoTankPred,'tank:'+new Date(n).toDateString(),true);
+if(s.on&&s.tank.s===2){S.pump.push({t:n,on:false,auto:1});act(l.logPumpAuto);raise('tank',l.abnTankNow,l.autoTankNow,'tank:'+new Date(n).toDateString())}
+if(s.light.s===1)raise('light',tf(l.abnLightPred,{eta:s.light.eta}),l.autoLightPred,'light:'+new Date(n).toDateString(),true);
+if(s.lo&&s.light.s===2){S.light.push({t:n,on:false,auto:1});act(l.logLightAuto);raise('light',l.abnLightNow,l.autoLightNow,'light:'+new Date(n).toDateString())}
+if(s.elec.s===2)raise('elec',l.abnElec,l.autoElec,'elec:'+s.el.t);
+const pc=S.contacts.find(c=>c.asset==='all');
+S.alerts.forEach(a=>{if(!a.ack&&!a.esc&&Date.now()-a.t>S.cfg.esc*6e4){a.esc=true;const pl=T[pc.lang],tx=(a.pred?pl.predTag:'')+pl[{tank:'tk',light:'lk',elec:'ek'}[a.kind]];
+S.sms.unshift(tf(pl.smsLine,{time:hm(Date.now()),mode:pl.modeOff,name:pc.name,phone:pc.phone,txt:tx}));act(tf(pl.logEscalated,{m:S.cfg.esc,name:pc.name}));if(!off())speak(tx,pc.lang)}});
+S.alerts=S.alerts.slice(0,20);S.sms=S.sms.slice(0,8);save()}
+function sim(){const l=L(),n=now();S.pump=[];S.light=[];S.elec=[];S.alerts=[];S.actions=[];S.sms=[];S.sensor=null;
+for(let d=30;d>=1;d--){const a=new Date(n-d*D);a.setHours(6,0,0,0);const du=(1.3+Math.random()*.4)*H;S.pump.push({t:+a,on:true},{t:+a+du,on:false});
+const o=new Date(n-d*D);o.setHours(18,30,0,0);const f=new Date(n-(d-1)*D);f.setHours(6,0,0,0);S.light.push({t:+o,on:true});if(+f<=n)S.light.push({t:+f,on:false});
+const e=new Date(n-d*D);e.setHours(20,0,0,0);S.elec.push({t:+e,u:d===1?62:+(40+Math.random()*6-3).toFixed(1)})}
+S.pump.push({t:n-3*H,on:true});S.light.push({t:n-25*6e4,on:true});act(l.logSimData);monitor();render()}
+function op(k,on){const l=L(),n=now();S[k].push({t:n,on});if(off())S.pend++;act(tf(k==='pump'?l.logPumpLog:l.logLightLog,{state:on?l.stateOn:l.stateOff}));monitor();render()}
+function cfg(k,v,num){S.cfg[k]=num?+v:v;save();if(k==='noon'||k==='lang')render();else monitor()}
+function fo(){S.cfg.fo=!S.cfg.fo;net()}
+function net(){const l=L(),o=off();$('#net').className='badge'+(o?' off':'');$('#net').textContent=o?l.offline:l.online;$('#fob').textContent=o?l.goOnline:l.testOffline;$('#ttl').textContent='💧 '+l.appName;if(!o&&S.pend){act(tf(l.logSyncedRecords,{n:S.pend}));S.pend=0;save()}}
+addEventListener('online',()=>{net();render()});addEventListener('offline',()=>{net();render()});
+function ack(id){const l=L(),a=S.alerts.find(a=>a.id===id);a.ack=true;act(tf(l.logAck,{name:a.to}));save();render()}
+function say(id){const a=S.alerts.find(a=>a.id===id);const pl=T[a.lang];speak((a.pred?pl.predTag:'')+pl[{tank:'tk',light:'lk',elec:'ek'}[a.kind]],a.lang)}
+const tabs=['home','op','vapp','hist','setup'];
+function render(){charts.forEach(c=>c.destroy());charts=[];const l=L();$('#lg').value=S.cfg.lang;document.documentElement.lang=S.cfg.lang;
+$('#nav').innerHTML=tabs.map(t=>'<button class="'+(t===tab?'on':'')+'" onclick="tab=\''+t+'\';render()">'+l[t]+'</button>').join('');
+const v=$('#v');if(tab==='home')v.innerHTML=home();else if(tab==='op')v.innerHTML=opv();else if(tab==='vapp')v.innerHTML=vapp();else if(tab==='hist'){v.innerHTML=hist();drawH()}else v.innerHTML=setup();net();if(tab==='vapp')vSpeak()}
+function home(){const l=L(),s=status(),w=['ok','warn','bad'];const open=S.alerts.find(a=>!a.ack);
+const syncPart=S.cfg.synced?tf(l.syncedOn,{t:new Date(S.cfg.synced).toLocaleString()}):l.syncPending;
+const mode=off()?'<div class="card"><b>'+l.offTitle+'</b><p>'+tf(l.offDesc,{sync:syncPart})+'</p></div>'
+:'<div class="card"><b>'+l.liveTitle+'</b><p>'+l.liveDesc+'</p><button class="btn" onclick="S.cfg.synced=Date.now();act(L().logSynced);save();render()">'+l.syncBtn+'</button></div>';
+const b=(open?'<div class="banner bad"><b>'+(open.pred?l.predSoon:l.abnNow)+': '+open.abn+'</b><b>'+l.sysResp+': '+open.auto+'</b><b>'+l.alerted+': '+open.to+(open.esc?l.escBanner:'')+'</b></div>':'<div class="banner"><b>'+l.allNormal+'</b></div>')+mode;
+const cd=['tank','light','elec'].map(k=>'<div class="card st s'+s[k].s+'"><div class="row"><b>'+l[k]+'</b><span class="pill">'+l[w[s[k].s]]+'</span></div><div>'+s[k].m+'</div><small>'+l.updated+' '+hm(now())+'</small></div>').join('');
+const al=S.alerts.map(a=>{const pl=T[a.lang];return '<div class="card"><div class="row"><b>'+l[a.kind]+'</b><small>'+hm(a.t)+' '+l.toWord+' '+a.to+(a.esc?l.escWord:'')+'</small></div><p>'+(a.pred?pl.predTag:'')+pl[{tank:'tk',light:'lk',elec:'ek'}[a.kind]]+'</p><div class="row"><button class="btn" onclick="say('+a.id+')">'+l.voice+'</button>'+(a.ack?'<small>'+l.ackedWord+'</small>':'<button class="btn" onclick="ack('+a.id+')">'+l.ack+'</button>')+'</div></div>'}).join('');
+return b+cd+(S.pump.length?'':'<div class="card"><p>'+l.noData+'</p><button class="btn" onclick="sim()">'+l.sim+'</button></div>')+al+'<div class="card log"><h2>'+l.whatHappened+'</h2>'+(S.actions.map(a=>'<div>'+hm(a.t)+' '+a.m+'</div>').join('')||'<small>'+l.nothingYet+'</small>')+'<h2 style="margin-top:12px">'+l.smsLog+'</h2>'+(S.sms.map(a=>'<div>'+a+'</div>').join('')||'<small>'+l.none+'</small>')+'</div>'}
+function opv(){const l=L();return'<div class="big"><button onclick="op(\'pump\',true)">'+l.pon+'</button><button class="off" onclick="op(\'pump\',false)">'+l.pof+'</button><button onclick="op(\'light\',true)">'+l.lon+'</button><button class="off" onclick="op(\'light\',false)">'+l.lof+'</button></div>'
++'<div class="card" style="margin-top:12px"><label>'+l.meterLabel+'</label><input id="mu" type="number" inputmode="decimal"><br><br><button class="btn" onclick="S.elec.push({t:now(),u:+$(\'#mu\').value});act(L().logMeter);monitor();render()">'+l.saveReading+'</button>'
++'<label>'+l.tankPctLabel+'</label><input id="sl" type="number" inputmode="numeric"><br><br><button class="btn" onclick="S.sensor={t:now(),p:+$(\'#sl\').value};act(L().logSensor);monitor();render()">'+l.sendSensor+'</button><p><small>'+l.sensorNote+'</small></p></div>'
++'<div class="card"><button class="btn" onclick="sim()">'+l.sim+'</button> <small>'+l.simNote+'</small></div>'}
+function vlang(x){S.cfg.vlang=x;save();render()}
+function vSpeak(){const open=S.alerts.find(a=>!a.ack);if(open&&S.vSeen!==open.id){S.vSeen=open.id;save();buzz();const pl=T[S.cfg.vlang];speak((open.pred?pl.predTag:'')+pl[{tank:'tk',light:'lk',elec:'ek'}[open.kind]],S.cfg.vlang)}}
+function vapp(){const vl=T[S.cfg.vlang],s=status(),w=['ok','warn','bad'];const open=S.alerts.find(a=>!a.ack);
+const langs=[['en','English'],['kn','ಕನ್ನಡ'],['hi','हिन्दी']].map(x=>'<button class="btn" style="'+(S.cfg.vlang===x[0]?'background:var(--acc);color:#fff':'')+'" onclick="vlang(\''+x[0]+'\')">'+x[1]+'</button>').join(' ');
+const head='<div class="card"><h2>'+vl.vWelcome+'</h2><small>'+vl.vChoose+'</small><div class="row" style="margin-top:8px;flex-wrap:wrap">'+langs+'</div></div>';
+let body;
+if(open){const pl=T[S.cfg.vlang];body='<div class="banner bad"><b style="font-size:20px">'+vl.vNew+'</b><p style="font-size:18px">'+(open.pred?pl.predTag:'')+pl[{tank:'tk',light:'lk',elec:'ek'}[open.kind]]+'</p><p>'+vl.vAttn+'</p><div class="row"><button class="btn" onclick="speak((S.alerts[0].pred?T[S.cfg.vlang].predTag:\'\')+T[S.cfg.vlang][{tank:\'tk\',light:\'lk\',elec:\'ek\'}[S.alerts[0].kind]],S.cfg.vlang)">'+vl.vListen+'</button><button class="btn" onclick="ack('+open.id+')">'+vl.vGotIt+'</button></div></div>'}
+else body='<div class="banner"><b style="font-size:20px">'+vl.vAllGood+'</b></div>';
+const cd=['tank','light','elec'].map(k=>'<div class="card st s'+s[k].s+'"><div class="row"><b>'+vl[k]+'</b><span class="pill">'+vl[w[s[k].s]]+'</span></div></div>').join('');
+return head+body+cd}
+function hist(){const l=L();return'<div class="row" style="margin-bottom:10px"><button class="btn" onclick="rng=7;render()">'+l.d7+'</button><button class="btn" onclick="rng=30;render()">'+l.d30+'</button></div>'+[['c1',l.chTank],['c2',l.chPump],['c3',l.chLight],['c4',l.chElec]].map(x=>'<div class="card"><h2>'+x[1]+'</h2><div class="cv"><canvas id="'+x[0]+'"></canvas></div></div>').join('')}
+function hrs(ev,a,b){ev=[...ev].sort((x,y)=>x.t-y.t);let s=0,o=null;const ov=(x,y)=>Math.max(0,Math.min(y,b)-Math.max(x,a));for(const e of ev){if(e.on&&o===null)o=e.t;if(!e.on&&o!==null){s+=ov(o,e.t);o=null}}if(o!==null)s+=ov(o,now());return s/H}
+function drawH(){const n=now(),cs=getComputedStyle(document.documentElement),ac=cs.getPropertyValue('--acc').trim(),rd=cs.getPropertyValue('--r').trim(),days=[...Array(rng).keys()].reverse().map(k=>{const d=new Date(n-k*D);d.setHours(0,0,0,0);return+d});
+const lb=days.map(t=>new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'}));
+const mk=(id,type,labels,ds)=>charts.push(new Chart($('#'+id),{type,data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:ds.length>1}},elements:{point:{radius:0}},scales:{x:{ticks:{maxTicksLimit:6}}}}}));
+const sr=replay(n).ser.filter(p=>p.t>=n-rng*D);
+mk('c1','line',sr.map(p=>new Date(p.t).toLocaleDateString(undefined,{day:'numeric',month:'short'})),[{data:sr.map(p=>Math.round(p.lv)),borderColor:ac,fill:false}]);
+mk('c2','bar',lb,[{data:days.map(t=>+hrs(S.pump,t,t+D).toFixed(1)),backgroundColor:ac}]);
+mk('c3','bar',lb,[{data:days.map(t=>+hrs(S.light,t,t+D).toFixed(1)),backgroundColor:ac}]);
+const eu=days.map(t=>{const e=S.elec.filter(x=>x.t>=t&&x.t<t+D).pop();return e?e.u:null});
+mk('c4','line',lb,[{label:'',data:eu,borderColor:ac,spanGaps:true},{label:'',data:days.map(()=>S.cfg.bill/30),borderColor:rd,borderDash:[5,4]}])}
+function setup(){const l=L(),c=S.cfg,f=(k,lab,t,n)=>'<label>'+lab+'</label><input type="'+(t||'number')+'" value="'+c[k]+'" onchange="cfg(\''+k+'\',this.value,'+(n===0?'false':'true')+')">';
+return'<div class="card"><h2>'+l.setupTitle+'</h2>'+f('cap',l.capLabel)+f('flow',l.flowLabel)+f('model',l.modelLabel,'text',0)+f('use',l.useLabel)+f('lightOn',l.lightOnLabel,'time',0)+f('lightOff',l.lightOffLabel,'time',0)+f('bill',l.billLabel)+f('esc',l.escLabel)+f('lead',l.leadLabel)+'<label><input type="checkbox" style="width:auto" '+(c.noon?'checked':'')+' onchange="cfg(\'noon\',this.checked)"> '+l.demoLabel+'</label></div>'
++'<div class="card"><h2>'+l.contactsTitle+'</h2>'+S.contacts.map((k,i)=>'<label>'+l[k.roleKey]+'</label><input value="'+k.name+'" onchange="S.contacts['+i+'].name=this.value;save()"><input value="'+k.phone+'" style="margin-top:4px" onchange="S.contacts['+i+'].phone=this.value;save()"><select style="margin-top:4px" onchange="S.contacts['+i+'].lang=this.value;save()">'+['en','kn','hi'].map(x=>'<option value="'+x+'" '+(k.lang===x?'selected':'')+'>'+{en:'English',kn:'ಕನ್ನಡ',hi:'हिन्दी'}[x]+'</option>').join('')+'</select>').join('')+'</div>'
++'<div class="card"><button class="btn" onclick="if(confirm(L().resetConfirm)){S=def();save();render()}">'+l.resetBtn+'</button></div>'}
+render();setInterval(()=>{monitor();if(tab==='home')render()},60000);if(S.pump.length)monitor();
+</script></body></html>
